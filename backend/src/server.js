@@ -221,6 +221,127 @@ app.get('/sites', authMiddleware, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────────────────
+// Listings API
+// ──────────────────────────────────────────────────────────────────────────
+
+// Get all listings for a site
+app.get('/sites/:siteId/listings', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+
+    // Verify site belongs to user's organization
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const listings = await prisma.listing.findMany({
+      where: { siteId },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({ listings });
+  } catch (error) {
+    console.error('Get listings error:', error);
+    res.status(500).json({ error: 'Failed to get listings' });
+  }
+});
+
+// Create listing
+app.post('/sites/:siteId/listings', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+    const { title, description, price, images, status } = req.body;
+
+    // Verify site belongs to user's organization
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const listing = await prisma.listing.create({
+      data: {
+        title,
+        description,
+        price: price ? parseFloat(price) : null,
+        images: images || [],
+        status: status || 'draft',
+        siteId
+      }
+    });
+
+    res.status(201).json({ listing });
+  } catch (error) {
+    console.error('Create listing error:', error);
+    res.status(500).json({ error: 'Failed to create listing' });
+  }
+});
+
+// Update listing
+app.put('/sites/:siteId/listings/:listingId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId, listingId } = req.params;
+    const { title, description, price, images, status } = req.body;
+
+    // Verify site belongs to user's organization
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const listing = await prisma.listing.update({
+      where: { id: listingId },
+      data: {
+        title,
+        description,
+        price: price ? parseFloat(price) : null,
+        images,
+        status
+      }
+    });
+
+    res.json({ listing });
+  } catch (error) {
+    console.error('Update listing error:', error);
+    res.status(500).json({ error: 'Failed to update listing' });
+  }
+});
+
+// Delete listing
+app.delete('/sites/:siteId/listings/:listingId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId, listingId } = req.params;
+
+    // Verify site belongs to user's organization
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    await prisma.listing.delete({
+      where: { id: listingId }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete listing error:', error);
+    res.status(500).json({ error: 'Failed to delete listing' });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────────────────
 // Error handling
 // ──────────────────────────────────────────────────────────────────────────
 

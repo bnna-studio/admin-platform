@@ -41,3 +41,76 @@ export async function getMe(token) {
 
   return res.json();
 }
+
+export async function getSites(token) {
+  const res = await fetch(`${API_URL}/sites`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get sites');
+  }
+
+  return res.json();
+}
+
+export async function getListings(token, siteId) {
+  const res = await fetch(`${API_URL}/sites/${siteId}/listings`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get listings');
+  }
+
+  return res.json();
+}
+
+export async function createListing(token, siteId, data) {
+  const res = await fetch(`${API_URL}/sites/${siteId}/listings`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to create listing');
+  }
+
+  return res.json();
+}
+
+export async function updateListing(token, siteId, listingId, data) {
+  const res = await fetch(`${API_URL}/sites/${siteId}/listings/${listingId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to update listing');
+  }
+
+  return res.json();
+}
+
+export async function deleteListing(token, siteId, listingId) {
+  const res = await fetch(`${API_URL}/sites/${siteId}/listings/${listingId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to delete listing');
+  }
+
+  return res.json();
+}

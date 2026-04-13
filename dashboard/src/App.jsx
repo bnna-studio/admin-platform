@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
 import LoginPage from './pages/LoginPage.jsx'
+import ListingsPage from './pages/ListingsPage.jsx'
+import { getSites } from './api/client.js'
 import './App.css'
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [user, setUser] = useState(null)
   const [organization, setOrganization] = useState(null)
+  const [sites, setSites] = useState([])
+  const [selectedSiteId, setSelectedSiteId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState('listings')
 
   useEffect(() => {
     // Check if user is already logged in
@@ -18,17 +23,32 @@ export default function App() {
         setUser(JSON.parse(userData))
         setOrganization(JSON.parse(orgData))
         setIsLoggedIn(true)
+        loadSites(token)
       }
     }
     setLoading(false)
   }, [])
 
+  const loadSites = async (token) => {
+    try {
+      const data = await getSites(token)
+      setSites(data.sites)
+      if (data.sites.length > 0) {
+        setSelectedSiteId(data.sites[0].id)
+      }
+    } catch (error) {
+      console.error('Failed to load sites:', error)
+    }
+  }
+
   const handleLoginSuccess = () => {
     const userData = localStorage.getItem('user')
     const orgData = localStorage.getItem('organization')
+    const token = localStorage.getItem('token')
     setUser(JSON.parse(userData))
     setOrganization(JSON.parse(orgData))
     setIsLoggedIn(true)
+    loadSites(token)
   }
 
   const handleLogout = () => {
@@ -38,6 +58,8 @@ export default function App() {
     setUser(null)
     setOrganization(null)
     setIsLoggedIn(false)
+    setSites([])
+    setSelectedSiteId(null)
   }
 
   if (loading) {
@@ -54,25 +76,61 @@ export default function App() {
         <div className="header-content">
           <h1>Admin Platform</h1>
           <div className="user-info">
-            <span>{organization?.name}</span>
+            <span className="org-name">{organization?.name}</span>
             <button onClick={handleLogout} className="btn-logout">Logout</button>
           </div>
         </div>
       </header>
 
-      <main className="dashboard-main">
-        <section>
-          <h2>Welcome, {user?.displayName || user?.email}</h2>
-          <div className="dashboard-content">
-            <p>You are logged in as <strong>{user?.email}</strong></p>
-            <p>Organization: <strong>{organization?.name}</strong></p>
-            <p>Role: <strong>{user?.role}</strong></p>
-            <hr />
-            <p className="info-text">✓ Authentication is working!</p>
-            <p className="info-text">Next: Build listings & SEO management features</p>
+      <div className="dashboard-layout">
+        <aside className="sidebar">
+          <div className="user-card">
+            <p className="user-email">{user?.email}</p>
+            <p className="user-role">{user?.role}</p>
           </div>
-        </section>
-      </main>
+
+          <nav className="sidebar-nav">
+            <h3>Navigation</h3>
+            <button
+              className={`nav-item ${currentPage === 'listings' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('listings')}
+            >
+              📝 Listings
+            </button>
+            <p className="nav-coming-soon">🔜 SEO Settings (Coming soon)</p>
+            <p className="nav-coming-soon">🔜 Sites (Coming soon)</p>
+          </nav>
+        </aside>
+
+        <main className="dashboard-main">
+          {sites.length === 0 ? (
+            <div className="no-sites">
+              <p>No sites found. Create one to get started!</p>
+              <p className="help-text">(Coming soon: Site management)</p>
+            </div>
+          ) : (
+            <>
+              <div className="site-selector">
+                <label>Selected Site:</label>
+                <select
+                  value={selectedSiteId}
+                  onChange={(e) => setSelectedSiteId(e.target.value)}
+                >
+                  {sites.map(site => (
+                    <option key={site.id} value={site.id}>
+                      {site.name} ({site.domain})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {currentPage === 'listings' && selectedSiteId && (
+                <ListingsPage siteId={selectedSiteId} user={user} />
+              )}
+            </>
+          )}
+        </main>
+      </div>
     </div>
   )
 }
