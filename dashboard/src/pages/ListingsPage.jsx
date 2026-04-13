@@ -9,6 +9,7 @@ export default function ListingsPage({ siteId, user }) {
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [filter, setFilter] = useState('all')
+  const [images, setImages] = useState([])
 
   const [formData, setFormData] = useState({
     title: '',
@@ -36,6 +37,21 @@ export default function ListingsPage({ siteId, user }) {
     }
   }
 
+  const handleImageUpload = (e) => {
+    const files = Array.from(e.target.files)
+    files.forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setImages((prev) => [...prev, event.target.result])
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const removeImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -44,12 +60,13 @@ export default function ListingsPage({ siteId, user }) {
       const token = localStorage.getItem('token')
       
       if (editingId) {
-        await updateListing(token, siteId, editingId, formData)
+        await updateListing(token, siteId, editingId, { ...formData, images })
       } else {
-        await createListing(token, siteId, formData)
+        await createListing(token, siteId, { ...formData, images })
       }
 
       setFormData({ title: '', description: '', price: '', status: 'draft' })
+      setImages([])
       setShowForm(false)
       setEditingId(null)
       await loadListings()
@@ -65,6 +82,7 @@ export default function ListingsPage({ siteId, user }) {
       price: listing.price || '',
       status: listing.status
     })
+    setImages(listing.images || [])
     setEditingId(listing.id)
     setShowForm(true)
   }
@@ -100,6 +118,7 @@ export default function ListingsPage({ siteId, user }) {
             setShowForm(!showForm)
             setEditingId(null)
             setFormData({ title: '', description: '', price: '', status: 'draft' })
+            setImages([])
           }}
           className="btn-primary"
         >
@@ -158,6 +177,30 @@ export default function ListingsPage({ siteId, user }) {
               </div>
             </div>
 
+            <div className="form-group">
+              <label>Images</label>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+              <div className="image-preview">
+                {images.map((img, idx) => (
+                  <div key={idx} className="image-item">
+                    <img src={img} alt={`Preview ${idx}`} />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="btn-remove-image"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <button type="submit" className="btn-primary">
               {editingId ? 'Update Listing' : 'Create Listing'}
             </button>
@@ -193,6 +236,7 @@ export default function ListingsPage({ siteId, user }) {
           <table>
             <thead>
               <tr>
+                <th></th>
                 <th>Title</th>
                 <th>Price</th>
                 <th>Status</th>
@@ -203,6 +247,11 @@ export default function ListingsPage({ siteId, user }) {
             <tbody>
               {filteredListings.map(listing => (
                 <tr key={listing.id}>
+                  <td className="image-cell">
+                    {listing.images && listing.images.length > 0 && (
+                      <img src={listing.images[0]} alt={listing.title} className="table-thumbnail" />
+                    )}
+                  </td>
                   <td className="title-cell">{listing.title}</td>
                   <td>{listing.price ? `$${listing.price.toFixed(2)}` : '-'}</td>
                   <td>
