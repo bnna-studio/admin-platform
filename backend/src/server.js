@@ -470,6 +470,124 @@ app.delete('/sites/:siteId/seo/:seoId', authMiddleware, async (req, res) => {
 });
 
 // ──────────────────────────────────────────────────────────────────────────
+// Public API (No Authentication Required)
+// ──────────────────────────────────────────────────────────────────────────
+
+// Get all listings for a site (public)
+app.get('/public/sites/:apiKey/listings', async (req, res) => {
+  try {
+    const { apiKey } = req.params;
+
+    // Find site by API key
+    const site = await prisma.site.findUnique({
+      where: { apiKey }
+    });
+
+    if (!site) {
+      return res.status(404).json({ error: 'Site not found' });
+    }
+
+    // Get all published listings for this site
+    const listings = await prisma.listing.findMany({
+      where: {
+        siteId: site.id,
+        status: 'published'
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({
+      site: {
+        id: site.id,
+        name: site.name,
+        domain: site.domain
+      },
+      listings
+    });
+  } catch (error) {
+    console.error('Get public listings error:', error);
+    res.status(500).json({ error: 'Failed to get listings' });
+  }
+});
+
+// Get all SEO settings for a site (public)
+app.get('/public/sites/:apiKey/seo', async (req, res) => {
+  try {
+    const { apiKey } = req.params;
+
+    // Find site by API key
+    const site = await prisma.site.findUnique({
+      where: { apiKey }
+    });
+
+    if (!site) {
+      return res.status(404).json({ error: 'Site not found' });
+    }
+
+    // Get all SEO settings for this site
+    const seoSettings = await prisma.sEOSettings.findMany({
+      where: { siteId: site.id },
+      orderBy: { pagePath: 'asc' }
+    });
+
+    res.json({
+      site: {
+        id: site.id,
+        name: site.name,
+        domain: site.domain
+      },
+      seoSettings
+    });
+  } catch (error) {
+    console.error('Get public SEO settings error:', error);
+    res.status(500).json({ error: 'Failed to get SEO settings' });
+  }
+});
+
+// Get specific SEO settings by page path (public)
+app.get('/public/sites/:apiKey/seo/:pagePath', async (req, res) => {
+  try {
+    const { apiKey, pagePath } = req.params;
+    const decodedPath = decodeURIComponent(pagePath);
+
+    // Find site by API key
+    const site = await prisma.site.findUnique({
+      where: { apiKey }
+    });
+
+    if (!site) {
+      return res.status(404).json({ error: 'Site not found' });
+    }
+
+    // Get SEO settings for specific page
+    const seoSetting = await prisma.sEOSettings.findUnique({
+      where: {
+        siteId_pagePath: {
+          siteId: site.id,
+          pagePath: decodedPath
+        }
+      }
+    });
+
+    if (!seoSetting) {
+      return res.status(404).json({ error: 'SEO settings not found for this page' });
+    }
+
+    res.json({
+      site: {
+        id: site.id,
+        name: site.name,
+        domain: site.domain
+      },
+      seoSetting
+    });
+  } catch (error) {
+    console.error('Get public SEO setting error:', error);
+    res.status(500).json({ error: 'Failed to get SEO setting' });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────────────────
 // Error handling
 // ──────────────────────────────────────────────────────────────────────────
 
