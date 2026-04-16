@@ -342,6 +342,134 @@ app.delete('/sites/:siteId/listings/:listingId', authMiddleware, async (req, res
 });
 
 // ──────────────────────────────────────────────────────────────────────────
+// SEO Settings API
+// ──────────────────────────────────────────────────────────────────────────
+
+// Get all SEO settings for a site
+app.get('/sites/:siteId/seo', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+
+    // Verify site belongs to user's organization
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const seoSettings = await prisma.sEOSettings.findMany({
+      where: { siteId },
+      orderBy: { pagePath: 'asc' }
+    });
+
+    res.json({ seoSettings });
+  } catch (error) {
+    console.error('Get SEO settings error:', error);
+    res.status(500).json({ error: 'Failed to get SEO settings' });
+  }
+});
+
+// Create SEO settings for a page
+app.post('/sites/:siteId/seo', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+    const { pagePath, metaTitle, metaDescription, ogImage, canonicalUrl } = req.body;
+
+    if (!pagePath) {
+      return res.status(400).json({ error: 'Page path is required' });
+    }
+
+    // Verify site belongs to user's organization
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const seoSetting = await prisma.sEOSettings.create({
+      data: {
+        pagePath,
+        metaTitle,
+        metaDescription,
+        ogImage,
+        canonicalUrl,
+        siteId
+      }
+    });
+
+    res.status(201).json({ seoSetting });
+  } catch (error) {
+    console.error('Create SEO settings error:', error);
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'SEO settings for this page already exist' });
+    }
+    res.status(500).json({ error: 'Failed to create SEO settings' });
+  }
+});
+
+// Update SEO settings
+app.put('/sites/:siteId/seo/:seoId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId, seoId } = req.params;
+    const { pagePath, metaTitle, metaDescription, ogImage, canonicalUrl } = req.body;
+
+    // Verify site belongs to user's organization
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const seoSetting = await prisma.sEOSettings.update({
+      where: { id: seoId },
+      data: {
+        pagePath,
+        metaTitle,
+        metaDescription,
+        ogImage,
+        canonicalUrl
+      }
+    });
+
+    res.json({ seoSetting });
+  } catch (error) {
+    console.error('Update SEO settings error:', error);
+    res.status(500).json({ error: 'Failed to update SEO settings' });
+  }
+});
+
+// Delete SEO settings
+app.delete('/sites/:siteId/seo/:seoId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId, seoId } = req.params;
+
+    // Verify site belongs to user's organization
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    await prisma.sEOSettings.delete({
+      where: { id: seoId }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete SEO settings error:', error);
+    res.status(500).json({ error: 'Failed to delete SEO settings' });
+  }
+});
+
+// ──────────────────────────────────────────────────────────────────────────
 // Error handling
 // ──────────────────────────────────────────────────────────────────────────
 

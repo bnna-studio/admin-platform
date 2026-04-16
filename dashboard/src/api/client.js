@@ -114,3 +114,64 @@ export async function deleteListing(token, siteId, listingId) {
 
   return res.json();
 }
+
+export async function getSEOSettings(token, siteId) {
+  const res = await fetch(`${API_URL}/sites/${siteId}/seo`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to get SEO settings');
+  }
+
+  return res.json();
+}
+
+export async function createSEOSettings(token, siteId, data) {
+  const res = await fetch(`${API_URL}/sites/${siteId}/seo`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to create SEO settings');
+  }
+
+  return res.json();
+}
+
+export async function updateSEOSettings(token, siteId, seoId, data) {
+  const res = await fetch(`${API_URL}/sites/${siteId}/seo/${seoId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to update SEO settings');
+  }
+
+  return res.json();
+}
+
+export async function deleteSEOSettings(token, siteId, seoId) {
+  const res = await fetch(`${API_URL}/sites/${siteId}/seo/${seoId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to delete SEO settings');
+  }
+
+  return res.json();
+}

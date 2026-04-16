@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import LoginPage from './pages/LoginPage.jsx'
 import ListingsPage from './pages/ListingsPage.jsx'
+import SEOSettingsPage from './pages/SEOSettingsPage.jsx'
 import { getSites } from './api/client.js'
 import './App.css'
 
@@ -97,7 +98,12 @@ export default function App() {
             >
               📝 Listings
             </button>
-            <p className="nav-coming-soon">🔜 SEO Settings (Coming soon)</p>
+            <button
+              className={`nav-item ${currentPage === 'seo' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('seo')}
+            >
+              🔍 SEO Settings
+            </button>
             <p className="nav-coming-soon">🔜 Sites (Coming soon)</p>
           </nav>
         </aside>
@@ -126,6 +132,10 @@ export default function App() {
 
               {currentPage === 'listings' && selectedSiteId && (
                 <ListingsPage siteId={selectedSiteId} user={user} />
+              )}
+
+              {currentPage === 'seo' && selectedSiteId && (
+                <SEOSettingsPage siteId={selectedSiteId} user={user} />
               )}
             </>
           )}
