@@ -210,13 +210,136 @@ app.get('/me', authMiddleware, async (req, res) => {
 app.get('/sites', authMiddleware, async (req, res) => {
   try {
     const sites = await prisma.site.findMany({
-      where: { organizationId: req.user.organizationId }
+      where: { organizationId: req.user.organizationId },
+      orderBy: { createdAt: 'desc' }
     });
 
     res.json({ sites });
   } catch (error) {
     console.error('Get sites error:', error);
     res.status(500).json({ error: 'Failed to get sites' });
+  }
+});
+
+// Get a single site
+app.get('/sites/:siteId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(404).json({ error: 'Site not found' });
+    }
+
+    res.json({ site });
+  } catch (error) {
+    console.error('Get site error:', error);
+    res.status(500).json({ error: 'Failed to get site' });
+  }
+});
+
+// Create a site
+app.post('/sites', authMiddleware, async (req, res) => {
+  try {
+    const { name, domain } = req.body;
+
+    if (!name || !domain) {
+      return res.status(400).json({ error: 'Name and domain are required' });
+    }
+
+    const site = await prisma.site.create({
+      data: {
+        name,
+        domain,
+        organizationId: req.user.organizationId
+      }
+    });
+
+    res.status(201).json({ site });
+  } catch (error) {
+    console.error('Create site error:', error);
+    res.status(500).json({ error: 'Failed to create site' });
+  }
+});
+
+// Update a site
+app.put('/sites/:siteId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+    const { name, domain } = req.body;
+
+    const existing = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!existing || existing.organizationId !== req.user.organizationId) {
+      return res.status(404).json({ error: 'Site not found' });
+    }
+
+    const site = await prisma.site.update({
+      where: { id: siteId },
+      data: { name, domain }
+    });
+
+    res.json({ site });
+  } catch (error) {
+    console.error('Update site error:', error);
+    res.status(500).json({ error: 'Failed to update site' });
+  }
+});
+
+// Delete a site
+app.delete('/sites/:siteId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+
+    const existing = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!existing || existing.organizationId !== req.user.organizationId) {
+      return res.status(404).json({ error: 'Site not found' });
+    }
+
+    await prisma.site.delete({
+      where: { id: siteId }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete site error:', error);
+    res.status(500).json({ error: 'Failed to delete site' });
+  }
+});
+
+// Rotate a site's API key
+app.post('/sites/:siteId/rotate-api-key', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+
+    const existing = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!existing || existing.organizationId !== req.user.organizationId) {
+      return res.status(404).json({ error: 'Site not found' });
+    }
+
+    const { randomBytes } = await import('crypto');
+    const newApiKey = randomBytes(24).toString('hex');
+
+    const site = await prisma.site.update({
+      where: { id: siteId },
+      data: { apiKey: newApiKey }
+    });
+
+    res.json({ site });
+  } catch (error) {
+    console.error('Rotate API key error:', error);
+    res.status(500).json({ error: 'Failed to rotate API key' });
   }
 });
 

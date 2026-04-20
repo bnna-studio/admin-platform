@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-seo="title">About</title>
+    <meta name="description" data-seo="description" content="" />
+    <link rel="canonical" data-seo="canonical" href="" />
+    <meta property="og:image" data-seo="og-image" content="" />
+    <meta property="og:title" data-seo="og-title" content="" />
+    <meta property="og:description" data-seo="og-description" content="" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a href="./index.html" class="brand" data-site-name>Demo Client Site</a>
+        <nav>
+          <a href="./index.html">Home</a>
+          <a href="./about.html">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <h1 data-seo="title">About this demo</h1>
+        <p data-seo="description">
+          This page pulls its title, description, and social image from the
+          Admin Platform SEO settings for the <code>/about</code> page path.
+        </p>
+      </section>
+
+      <section class="prose">
+        <p>
+          Edit the SEO record for <code>/about</code> in the admin dashboard and
+          refresh — the meta tags at the top of this document, and the headline
+          above, will update automatically.
+        </p>
+        <p>
+          Published listings are shown on the home page. They are fetched from
+          <code>/public/sites/:apiKey/listings</code> and filtered to
+          <code>status = "published"</code> by the backend.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Powered by the Admin Platform public API.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

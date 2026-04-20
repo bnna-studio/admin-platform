@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import LoginPage from './pages/LoginPage.jsx'
 import ListingsPage from './pages/ListingsPage.jsx'
 import SEOSettingsPage from './pages/SEOSettingsPage.jsx'
+import SitesPage from './pages/SitesPage.jsx'
 import { getSites } from './api/client.js'
 import './App.css'
 
@@ -104,15 +105,36 @@ export default function App() {
             >
               🔍 SEO Settings
             </button>
-            <p className="nav-coming-soon">🔜 Sites (Coming soon)</p>
+            <button
+              className={`nav-item ${currentPage === 'sites' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('sites')}
+            >
+              🌐 Sites
+            </button>
           </nav>
         </aside>
 
         <main className="dashboard-main">
-          {sites.length === 0 ? (
+          {currentPage === 'sites' ? (
+            <SitesPage
+              onSitesChanged={(nextSites) => {
+                setSites(nextSites)
+                if (nextSites.length === 0) {
+                  setSelectedSiteId(null)
+                } else if (!nextSites.find(s => s.id === selectedSiteId)) {
+                  setSelectedSiteId(nextSites[0].id)
+                }
+              }}
+            />
+          ) : sites.length === 0 ? (
             <div className="no-sites">
               <p>No sites found. Create one to get started!</p>
-              <p className="help-text">(Coming soon: Site management)</p>
+              <button
+                onClick={() => setCurrentPage('sites')}
+                className="btn-primary"
+              >
+                Go to Sites
+              </button>
             </div>
           ) : (
             <>

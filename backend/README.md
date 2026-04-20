@@ -47,18 +47,25 @@ npx prisma studio
 
 ### Sites
 - `GET /sites` — List sites for organization
-- `GET /sites/:id` — Get site details
+- `GET /sites/:siteId` — Get site details
+- `POST /sites` — Create a site
+- `PUT /sites/:siteId` — Update a site
+- `DELETE /sites/:siteId` — Delete a site
+- `POST /sites/:siteId/rotate-api-key` — Rotate the public API key
 
 ### Listings (Phase 2)
-- `GET /sites/:id/listings`
-- `POST /sites/:id/listings`
-- `PUT /sites/:id/listings/:listingId`
-- `DELETE /sites/:id/listings/:listingId`
+- `GET /sites/:siteId/listings`
+- `POST /sites/:siteId/listings`
+- `PUT /sites/:siteId/listings/:listingId`
+- `DELETE /sites/:siteId/listings/:listingId`
 
 ### SEO (Phase 3)
-- `GET /sites/:id/seo`
-- `PUT /sites/:id/seo`
+- `GET /sites/:siteId/seo`
+- `POST /sites/:siteId/seo`
+- `PUT /sites/:siteId/seo/:seoId`
+- `DELETE /sites/:siteId/seo/:seoId`
 
 ### Public API (Phase 4)
 - `GET /public/sites/:apiKey/listings`
 - `GET /public/sites/:apiKey/seo`
+- `GET /public/sites/:apiKey/seo/:pagePath`
