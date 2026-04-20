@@ -5,8 +5,7 @@
   "type": "module",
   "workspaces": [
     "backend",
-    "dashboard",
-    "cms-site"
+    "dashboard"
   ],
   "scripts": {
     "dev": "npm run dev --workspaces",

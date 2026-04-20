@@ -6,7 +6,6 @@ Multi-tenant SaaS admin dashboard for managing client websites.
 
 - **backend/** — Node.js + Express API
 - **dashboard/** — React + Vite admin UI
-- **cms-site/** — Demo client site consuming the public API
 
 ## Quick Start
 
@@ -35,7 +34,6 @@ npm run dev
 
 Backend runs on `http://localhost:3000`
 Dashboard runs on `http://localhost:5173`
-Demo cms-site runs on `http://localhost:5174` (see `cms-site/README.md`)
 
 ## API Documentation
 
