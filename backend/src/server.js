@@ -220,6 +220,30 @@ app.get('/sites', authMiddleware, async (req, res) => {
   }
 });
 
+// Create new site for organization
+app.post('/sites', authMiddleware, async (req, res) => {
+  try {
+    const { name, domain } = req.body;
+
+    if (!name || !domain) {
+      return res.status(400).json({ error: 'name and domain are required' });
+    }
+
+    const site = await prisma.site.create({
+      data: {
+        name,
+        domain,
+        organizationId: req.user.organizationId
+      }
+    });
+
+    res.json(site);
+  } catch (error) {
+    console.error('Create site error:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
 // ──────────────────────────────────────────────────────────────────────────
 // Listings API
 // ──────────────────────────────────────────────────────────────────────────
