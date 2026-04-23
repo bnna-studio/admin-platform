@@ -14,11 +14,12 @@ const prisma = new PrismaClient();
 // ──────────────────────────────────────────────────────────────────────────
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: true,
   credentials: true,
-}));
+}));;
 
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb' }));
 
 // Auth middleware - extract JWT from Authorization header
 function authMiddleware(req, res, next) {
