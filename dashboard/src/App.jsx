@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import LoginPage from './pages/LoginPage.jsx'
 import ListingsPage from './pages/ListingsPage.jsx'
 import SEOSettingsPage from './pages/SEOSettingsPage.jsx'
+import SitesPage from './pages/SitesPage.jsx'
 import { getSites } from './api/client.js'
 import './App.css'
 
@@ -34,12 +35,20 @@ export default function App() {
     try {
       const data = await getSites(token)
       setSites(data.sites)
-      if (data.sites.length > 0) {
-        setSelectedSiteId(data.sites[0].id)
-      }
+      setSelectedSiteId((prev) => {
+        if (prev && data.sites.some((s) => s.id === prev)) {
+          return prev
+        }
+        return data.sites.length > 0 ? data.sites[0].id : null
+      })
     } catch (error) {
       console.error('Failed to load sites:', error)
     }
+  }
+
+  const refreshSites = () => {
+    const token = localStorage.getItem('token')
+    if (token) loadSites(token)
   }
 
   const handleLoginSuccess = () => {
@@ -104,15 +113,21 @@ export default function App() {
             >
               🔍 SEO Settings
             </button>
-            <p className="nav-coming-soon">🔜 Sites (Coming soon)</p>
+            <button
+              className={`nav-item ${currentPage === 'sites' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('sites')}
+            >
+              🌐 Sites
+            </button>
           </nav>
         </aside>
 
         <main className="dashboard-main">
-          {sites.length === 0 ? (
+          {currentPage === 'sites' ? (
+            <SitesPage onSitesChanged={refreshSites} />
+          ) : sites.length === 0 ? (
             <div className="no-sites">
-              <p>No sites found. Create one to get started!</p>
-              <p className="help-text">(Coming soon: Site management)</p>
+              <p>No sites found. Go to the Sites page to create one!</p>
             </div>
           ) : (
             <>

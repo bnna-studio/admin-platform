@@ -54,6 +54,38 @@ export async function getSites(token) {
   return res.json();
 }
 
+export async function createSite(token, data) {
+  const res = await fetch(`${API_URL}/sites`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Failed to create site');
+  }
+
+  return res.json();
+}
+
+export async function deleteSite(token, siteId) {
+  const res = await fetch(`${API_URL}/sites/${siteId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to delete site');
+  }
+
+  return res.json();
+}
+
 export async function getListings(token, siteId) {
   const res = await fetch(`${API_URL}/sites/${siteId}/listings`, {
     headers: { Authorization: `Bearer ${token}` }
