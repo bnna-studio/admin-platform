@@ -53,8 +53,8 @@ export default function LoginPage({ onLoginSuccess }) {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h1>Admin Platform</h1>
-        <p className="subtitle">Content Management System</p>
+        <img src="/Logo.svg" alt="Moai Creative" className="login-logo" />
+        <p className="subtitle">Admin Platform</p>
 
         {error && <div className="error-message">{error}</div>}
 

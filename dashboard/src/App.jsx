@@ -84,7 +84,7 @@ export default function App() {
     <div className="app">
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>Admin Platform</h1>
+          <img src="/Logo.svg" alt="Moai Creative" className="brand-logo" />
           <div className="user-info">
             <span className="org-name">{organization?.name}</span>
             <button onClick={handleLogout} className="btn-logout">Logout</button>
@@ -105,19 +105,19 @@ export default function App() {
               className={`nav-item ${currentPage === 'listings' ? 'active' : ''}`}
               onClick={() => setCurrentPage('listings')}
             >
-              📝 Listings
+              Listings
             </button>
             <button
               className={`nav-item ${currentPage === 'seo' ? 'active' : ''}`}
               onClick={() => setCurrentPage('seo')}
             >
-              🔍 SEO Settings
+              SEO Settings
             </button>
             <button
               className={`nav-item ${currentPage === 'sites' ? 'active' : ''}`}
               onClick={() => setCurrentPage('sites')}
             >
-              🌐 Sites
+              Sites
             </button>
           </nav>
         </aside>
