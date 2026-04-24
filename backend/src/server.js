@@ -245,6 +245,30 @@ app.post('/sites', authMiddleware, async (req, res) => {
   }
 });
 
+// Delete a site (cascades to listings and SEO settings)
+app.delete('/sites/:siteId', authMiddleware, async (req, res) => {
+  try {
+    const { siteId } = req.params;
+
+    const site = await prisma.site.findUnique({
+      where: { id: siteId }
+    });
+
+    if (!site || site.organizationId !== req.user.organizationId) {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    await prisma.site.delete({
+      where: { id: siteId }
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Delete site error:', error);
+    res.status(500).json({ error: 'Failed to delete site' });
+  }
+});
+
 // ──────────────────────────────────────────────────────────────────────────
 // Listings API
 // ──────────────────────────────────────────────────────────────────────────
