@@ -13,10 +13,31 @@ const prisma = new PrismaClient();
 // Middleware
 // ──────────────────────────────────────────────────────────────────────────
 
-app.use(cors({
-  origin: true,
+// Comma-separated list of allowed origins for the admin dashboard, e.g.
+// "https://admin.moaicreative.com,https://admin-platform.up.railway.app"
+const allowedOrigins = (process.env.CORS_ORIGINS || process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+const adminCors = cors({
+  origin(origin, cb) {
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error(`Origin ${origin} not allowed by CORS`));
+  },
   credentials: true,
-}));;
+});
+
+// Public API and /health are open to any origin (client websites hit them).
+const publicCors = cors({ origin: true });
+
+app.use((req, res, next) => {
+  if (req.path === '/health' || req.path.startsWith('/public/')) {
+    return publicCors(req, res, next);
+  }
+  return adminCors(req, res, next);
+});
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb' }));
