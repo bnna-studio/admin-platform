@@ -21,6 +21,7 @@
 }
 
 .sites-header .btn-primary {
+  width: auto;
   min-width: 180px;
   white-space: nowrap;
   flex-shrink: 0;
