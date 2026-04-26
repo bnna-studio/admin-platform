@@ -7,6 +7,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 2rem;
   margin-bottom: 2rem;
 }
 
@@ -16,6 +17,13 @@
   font-weight: 500;
   color: var(--text);
   letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.sites-header .btn-primary {
+  min-width: 180px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .site-form {
