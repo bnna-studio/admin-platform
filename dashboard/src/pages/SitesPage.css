@@ -18,6 +18,67 @@
   letter-spacing: -0.01em;
 }
 
+.site-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.75rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.site-form h3 {
+  margin: 0 0 0.5rem;
+  color: var(--text);
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.site-form-help {
+  margin: 0 0 1.5rem;
+  color: var(--text-subtle);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.site-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.site-form .form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.site-form .form-group input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.site-form .form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
 .sites-table {
   background: var(--surface);
   border: 1px solid var(--border);
