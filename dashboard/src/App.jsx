@@ -13,7 +13,7 @@ export default function App() {
   const [sites, setSites] = useState([])
   const [selectedSiteId, setSelectedSiteId] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState('listings')
+  const [currentPage, setCurrentPage] = useState('sites')
 
   useEffect(() => {
     // Check if user is already logged in
@@ -102,6 +102,12 @@ export default function App() {
           <nav className="sidebar-nav">
             <h3>Navigation</h3>
             <button
+              className={`nav-item ${currentPage === 'sites' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('sites')}
+            >
+              Sites
+            </button>
+            <button
               className={`nav-item ${currentPage === 'listings' ? 'active' : ''}`}
               onClick={() => setCurrentPage('listings')}
             >
@@ -112,12 +118,6 @@ export default function App() {
               onClick={() => setCurrentPage('seo')}
             >
               SEO Settings
-            </button>
-            <button
-              className={`nav-item ${currentPage === 'sites' ? 'active' : ''}`}
-              onClick={() => setCurrentPage('sites')}
-            >
-              Sites
             </button>
           </nav>
         </aside>
