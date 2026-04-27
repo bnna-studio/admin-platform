@@ -6,7 +6,8 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "node --watch src/server.js",
-    "start": "node src/server.js",
+    "build": "prisma generate",
+    "start": "prisma migrate deploy && node src/server.js",
     "lint": "eslint src --ext js"
   },
   "dependencies": {

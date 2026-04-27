@@ -13,7 +13,7 @@ export default function App() {
   const [sites, setSites] = useState([])
   const [selectedSiteId, setSelectedSiteId] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState('listings')
+  const [currentPage, setCurrentPage] = useState('sites')
 
   useEffect(() => {
     // Check if user is already logged in
@@ -84,7 +84,7 @@ export default function App() {
     <div className="app">
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>Admin Platform</h1>
+          <img src="/Logo.svg" alt="Moai Creative" className="brand-logo" />
           <div className="user-info">
             <span className="org-name">{organization?.name}</span>
             <button onClick={handleLogout} className="btn-logout">Logout</button>
@@ -102,22 +102,22 @@ export default function App() {
           <nav className="sidebar-nav">
             <h3>Navigation</h3>
             <button
+              className={`nav-item ${currentPage === 'sites' ? 'active' : ''}`}
+              onClick={() => setCurrentPage('sites')}
+            >
+              Sites
+            </button>
+            <button
               className={`nav-item ${currentPage === 'listings' ? 'active' : ''}`}
               onClick={() => setCurrentPage('listings')}
             >
-              📝 Listings
+              Listings
             </button>
             <button
               className={`nav-item ${currentPage === 'seo' ? 'active' : ''}`}
               onClick={() => setCurrentPage('seo')}
             >
-              🔍 SEO Settings
-            </button>
-            <button
-              className={`nav-item ${currentPage === 'sites' ? 'active' : ''}`}
-              onClick={() => setCurrentPage('sites')}
-            >
-              🌐 Sites
+              SEO Settings
             </button>
           </nav>
         </aside>

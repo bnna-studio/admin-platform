@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getSites, deleteSite } from '../api/client.js'
+import { getSites, createSite, deleteSite } from '../api/client.js'
 import './SitesPage.css'
 
 export default function SitesPage({ onSitesChanged }) {
@@ -9,6 +9,9 @@ export default function SitesPage({ onSitesChanged }) {
   const [copiedSiteId, setCopiedSiteId] = useState(null)
   const [siteToDelete, setSiteToDelete] = useState(null)
   const [deleting, setDeleting] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [formData, setFormData] = useState({ name: '', domain: '' })
 
   useEffect(() => {
     loadSites()
@@ -38,6 +41,31 @@ export default function SitesPage({ onSitesChanged }) {
     }
   }
 
+  const resetForm = () => {
+    setFormData({ name: '', domain: '' })
+    setShowForm(false)
+  }
+
+  const handleCreate = async (e) => {
+    e.preventDefault()
+    setCreating(true)
+    setError('')
+    try {
+      const token = localStorage.getItem('token')
+      await createSite(token, {
+        name: formData.name.trim(),
+        domain: formData.domain.trim()
+      })
+      resetForm()
+      await loadSites()
+      if (onSitesChanged) onSitesChanged()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setCreating(false)
+    }
+  }
+
   const handleConfirmDelete = async () => {
     if (!siteToDelete) return
     setDeleting(true)
@@ -63,12 +91,67 @@ export default function SitesPage({ onSitesChanged }) {
     <div className="sites-container">
       <div className="sites-header">
         <h2>Sites</h2>
+        <button
+          onClick={() => (showForm ? resetForm() : setShowForm(true))}
+          className="btn-primary"
+        >
+          {showForm ? 'Cancel' : '+ New Site'}
+        </button>
       </div>
 
       {error && <div className="error-message">{error}</div>}
 
+      {showForm && (
+        <div className="site-form">
+          <h3>Add a Site</h3>
+          <p className="site-form-help">
+            Sites can be hosted anywhere. Once created, use the API key to fetch
+            SEO and listings data from the public API.
+          </p>
+          <form onSubmit={handleCreate}>
+            <div className="form-group">
+              <label>Name *</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g. Acme Marketing Site"
+                required
+                disabled={creating}
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Domain *</label>
+              <input
+                type="text"
+                value={formData.domain}
+                onChange={(e) => setFormData({ ...formData, domain: e.target.value })}
+                placeholder="e.g. acme.com"
+                required
+                disabled={creating}
+              />
+            </div>
+
+            <div className="form-actions">
+              <button
+                type="button"
+                onClick={resetForm}
+                className="btn-secondary"
+                disabled={creating}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn-primary" disabled={creating}>
+                {creating ? 'Creating...' : 'Create site'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
       {sites.length === 0 ? (
-        <p className="empty-state">No sites yet.</p>
+        <p className="empty-state">No sites yet. Click “+ New Site” to add one.</p>
       ) : (
         <div className="sites-table">
           <table>
